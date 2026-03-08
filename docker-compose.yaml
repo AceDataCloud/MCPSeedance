@@ -1,0 +1,9 @@
+version: "3"
+services:
+  mcp-seedance:
+    platform: linux/amd64
+    container_name: "mcp-seedance"
+    build: ./
+    image: "ghcr.io/acedatacloud/mcp-seedance:${BUILD_NUMBER}"
+    ports:
+      - "8000:8000"

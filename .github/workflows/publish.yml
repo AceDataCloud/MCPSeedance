@@ -1,0 +1,139 @@
+name: Publish to PyPI
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build distribution
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate date-based version
+        id: version
+        run: |
+          # 版本格式: YYYY.MM.DD.BUILD
+          # BUILD 是当天的构建序号，从 PyPI 获取已发布版本来确定
+          DATE_PREFIX=$(date +'%Y.%-m.%-d')
+
+          # 获取当天已发布的最高版本号
+          pip install requests -q
+          LATEST_BUILD=$(python -c "
+          import requests
+          import re
+          try:
+              resp = requests.get('https://pypi.org/pypi/mcp-seedance/json', timeout=10)
+              if resp.status_code == 200:
+                  versions = resp.json().get('releases', {}).keys()
+                  today_prefix = '${DATE_PREFIX}'
+                  today_versions = [v for v in versions if v.startswith(today_prefix)]
+                  if today_versions:
+                      builds = []
+                      for v in today_versions:
+                          parts = v.split('.')
+                          if len(parts) == 4:
+                              builds.append(int(parts[3]))
+                      print(max(builds) + 1 if builds else 0)
+                  else:
+                      print(0)
+              else:
+                  print(0)
+          except:
+              print(0)
+          ")
+
+          VERSION="${DATE_PREFIX}.${LATEST_BUILD}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Generated version: $VERSION"
+
+      - name: Update version in pyproject.toml
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          python -c "
+          import re
+          with open('pyproject.toml', 'r') as f:
+              content = f.read()
+          content = re.sub(r'version = \"[^\"]+\"', f'version = \"$VERSION\"', content, count=1)
+          with open('pyproject.toml', 'w') as f:
+              f.write(content)
+          "
+          echo "Updated pyproject.toml to version $VERSION"
+          cat pyproject.toml | grep -m1 "version"
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build "twine>=5.0.0,<6.0.0"
+
+      - name: Build package
+        run: python -m build
+
+      - name: Check package metadata
+        run: twine check dist/*
+
+      - name: Upload distribution artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+  publish-pypi:
+    name: Publish to PyPI
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/mcp-seedance/${{ needs.build.outputs.version }}
+    steps:
+      - name: Download distribution artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          pip install "twine>=5.0.0,<6.0.0"
+          twine upload dist/*
+
+  create-release:
+    name: Create GitHub Release
+    if: github.event_name == 'push'
+    needs: [build, publish-pypi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download distribution artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ needs.build.outputs.version }}" dist/* \
+            --title "v${{ needs.build.outputs.version }}" \
+            --generate-notes \
+            --repo '${{ github.repository }}' || echo "Release already exists, skipping"
