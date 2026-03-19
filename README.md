@@ -1,6 +1,6 @@
 # MCP Seedance
 
-<!-- mcp-name: io.github.acedatacloud/mcp-seedance -->
+<!-- mcp-name: io.github.AceDataCloud/mcp-seedance -->
 
 [![PyPI version](https://img.shields.io/pypi/v/mcp-seedance.svg)](https://pypi.org/project/mcp-seedance/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/mcp-seedance.svg)](https://pypi.org/project/mcp-seedance/)
