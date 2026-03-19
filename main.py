@@ -184,26 +184,54 @@ Environment Variables:
 
             async def server_card(_request: Request) -> JSONResponse:
                 """MCP Server Card for Smithery and other registries."""
-                return JSONResponse({
-                    "serverInfo": {"name": "MCP Seedance"},
-                    "authentication": {"required": True, "schemes": ["bearer"]},
-                    "tools": [
-                    {"name": "seedance_generate_video", "description": "Generate video from text"},
-                    {"name": "seedance_generate_video_from_image", "description": "Generate video from image"},
-                    {"name": "seedance_get_task", "description": "Query task status"},
-                    {"name": "seedance_get_tasks_batch", "description": "Query multiple tasks"},
-                    {"name": "seedance_list_models", "description": "List available models"},
-                    {"name": "seedance_list_resolutions", "description": "List supported resolutions"},
-                    {"name": "seedance_list_actions", "description": "List available actions"}
-                    ],
-                    "prompts": [
-                    {"name": "seedance_video_generation_guide", "description": "Guide for video generation"},
-                    {"name": "seedance_workflow_examples", "description": "Example workflows"},
-                    {"name": "seedance_prompt_suggestions", "description": "Prompt suggestions"}
-                    ],
-                    "resources": [],
-                })
-
+                return JSONResponse(
+                    {
+                        "serverInfo": {"name": "MCP Seedance"},
+                        "authentication": {"required": True, "schemes": ["bearer"]},
+                        "tools": [
+                            {
+                                "name": "seedance_generate_video",
+                                "description": "Generate video from text",
+                            },
+                            {
+                                "name": "seedance_generate_video_from_image",
+                                "description": "Generate video from image",
+                            },
+                            {"name": "seedance_get_task", "description": "Query task status"},
+                            {
+                                "name": "seedance_get_tasks_batch",
+                                "description": "Query multiple tasks",
+                            },
+                            {
+                                "name": "seedance_list_models",
+                                "description": "List available models",
+                            },
+                            {
+                                "name": "seedance_list_resolutions",
+                                "description": "List supported resolutions",
+                            },
+                            {
+                                "name": "seedance_list_actions",
+                                "description": "List available actions",
+                            },
+                        ],
+                        "prompts": [
+                            {
+                                "name": "seedance_video_generation_guide",
+                                "description": "Guide for video generation",
+                            },
+                            {
+                                "name": "seedance_workflow_examples",
+                                "description": "Example workflows",
+                            },
+                            {
+                                "name": "seedance_prompt_suggestions",
+                                "description": "Prompt suggestions",
+                            },
+                        ],
+                        "resources": [],
+                    }
+                )
 
             @contextlib.asynccontextmanager
             async def lifespan(_app: Starlette):  # type: ignore[no-untyped-def]
