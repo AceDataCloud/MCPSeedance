@@ -1,5 +1,5 @@
 {
-  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.acedatacloud/mcp-seedance",
   "description": "MCP server for ByteDance Seedance AI video generation",
   "version": "0.1.0",
@@ -7,24 +7,24 @@
     "url": "https://github.com/AceDataCloud/MCPSeedance",
     "source": "github"
   },
-  "website_url": "https://platform.acedata.cloud",
   "packages": [
     {
-      "registry_type": "pypi",
       "identifier": "mcp-seedance",
       "version": "0.1.0",
-      "runtime_hint": "uvx",
       "transport": {
         "type": "stdio"
       },
-      "environment_variables": [
+      "registryType": "pypi",
+      "runtimeHint": "uvx",
+      "environmentVariables": [
         {
           "name": "ACEDATACLOUD_API_TOKEN",
           "description": "API token from Ace Data Cloud (https://platform.acedata.cloud)",
-          "is_required": true,
-          "is_secret": true
+          "isRequired": true,
+          "isSecret": true
         }
       ]
     }
-  ]
+  ],
+  "websiteUrl": "https://platform.acedata.cloud"
 }
