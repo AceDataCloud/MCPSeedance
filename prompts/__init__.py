@@ -49,7 +49,8 @@ When the user wants to generate video, choose the appropriate tool based on thei
 - User asks "is my video done?"
 
 ## Important Notes:
-1. Video generation may take 30s to several minutes depending on settings
+1. Video generation is async in MCP and should return quickly with a task_id
+2. After submission, poll with `seedance_get_task` until the final video URLs are available
 2. Default resolution is 720p, default ratio is 16:9
 3. Duration range: 2-12 seconds
 4. Only 1.5 Pro model supports audio generation
@@ -68,8 +69,8 @@ def seedance_workflow_examples() -> str:
 ## Workflow 1: Quick Video Generation
 1. User: "Make me a video of waves on a beach"
 2. Call `seedance_generate_video(prompt="Ocean waves gently crashing on sandy beach, sunset, cinematic")`
-3. Return task_id and video URL to user
-4. If async, user can check status with `seedance_get_task(task_id)`
+3. Return the task_id from the submission response
+4. Poll with `seedance_get_task(task_id)` until the completed video URLs are available
 
 ## Workflow 2: Animate an Image
 1. User provides image URL

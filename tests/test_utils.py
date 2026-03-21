@@ -20,6 +20,7 @@ class TestFormatVideoResult:
         assert data["task_id"] == "test-task-123"
         assert data["data"]["status"] == "succeeded"
         assert "video_url" in data["data"]["content"]
+        assert data["mcp_async_submission"]["poll_tool"] == "seedance_get_task"
 
     def test_format_error(self, mock_error_response: dict) -> None:
         """Test formatting error response."""
@@ -46,6 +47,7 @@ class TestFormatTaskResult:
         assert data["id"] == "task-123"
         assert data["request"]["model"] == "doubao-seedance-1-0-pro-250528"
         assert data["response"]["success"] is True
+        assert data["mcp_task_polling"]["poll_tool"] == "seedance_get_task"
 
 
 class TestFormatBatchTaskResult:

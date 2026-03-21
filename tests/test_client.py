@@ -37,6 +37,25 @@ class TestSeedanceClient:
         with pytest.raises(SeedanceAuthError, match="not configured"):
             c._get_headers()
 
+    def test_with_async_callback_injects_default_callback(
+        self, test_client: SeedanceClient
+    ) -> None:
+        """Test async submission injects an internal callback when missing."""
+        payload = test_client._with_async_callback({"model": "doubao-seedance-1-0-pro-250528"})
+        assert payload["callback_url"] == "https://api.acedata.cloud/health"
+
+    def test_with_async_callback_preserves_explicit_callback(
+        self, test_client: SeedanceClient
+    ) -> None:
+        """Test async submission preserves a user-provided callback."""
+        payload = test_client._with_async_callback(
+            {
+                "model": "doubao-seedance-1-0-pro-250528",
+                "callback_url": "https://example.com/webhook",
+            }
+        )
+        assert payload["callback_url"] == "https://example.com/webhook"
+
     @pytest.mark.asyncio
     async def test_request_success(
         self,
