@@ -58,6 +58,24 @@ class TestSeedanceGenerateVideo:
             assert "frames" not in call_kwargs
 
     @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "model",
+        ["doubao-seedance-2-0-260128", "doubao-seedance-2-0-fast-260128"],
+    )
+    async def test_new_models_parameter_sent_to_api(
+        self, model: str, mock_video_response: dict
+    ) -> None:
+        """Test that newly added model values are accepted and sent to the API."""
+        with patch("tools.video_tools.client") as mock_client:
+            mock_client.generate_video = AsyncMock(return_value=mock_video_response)
+            await seedance_generate_video(
+                prompt="A test video",
+                model=model,
+            )
+            call_kwargs = mock_client.generate_video.call_args[1]
+            assert call_kwargs["model"] == model
+
+    @pytest.mark.asyncio
     async def test_execution_expires_after_default(self, mock_video_response: dict) -> None:
         """Test that execution_expires_after defaults to 172800."""
         with patch("tools.video_tools.client") as mock_client:
@@ -118,6 +136,25 @@ class TestSeedanceGenerateVideoFromImage:
             call_kwargs = mock_client.generate_video.call_args[1]
             assert call_kwargs["frames"] == 33
             assert "duration" not in call_kwargs
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "model",
+        ["doubao-seedance-2-0-260128", "doubao-seedance-2-0-fast-260128"],
+    )
+    async def test_new_models_parameter_sent_to_api(
+        self, model: str, mock_video_response: dict
+    ) -> None:
+        """Test that newly added model values are accepted and sent to the API."""
+        with patch("tools.video_tools.client") as mock_client:
+            mock_client.generate_video = AsyncMock(return_value=mock_video_response)
+            await seedance_generate_video_from_image(
+                prompt="A test video",
+                first_frame_url="https://example.com/image.jpg",
+                model=model,
+            )
+            call_kwargs = mock_client.generate_video.call_args[1]
+            assert call_kwargs["model"] == model
 
     @pytest.mark.asyncio
     async def test_execution_expires_after_default(self, mock_video_response: dict) -> None:

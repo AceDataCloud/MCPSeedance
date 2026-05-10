@@ -39,6 +39,8 @@ async def seedance_generate_video(
         Field(
             description=(
                 "Model version to use. Options: "
+                "'doubao-seedance-2-0-260128' (latest generation quality model), "
+                "'doubao-seedance-2-0-fast-260128' (latest generation fast model), "
                 "'doubao-seedance-1-5-pro-251215' (newest flagship, supports audio), "
                 "'doubao-seedance-1-0-pro-250528' (standard, default), "
                 "'doubao-seedance-1-0-pro-fast-251015' (fast, cost-optimized), "
@@ -243,6 +245,8 @@ async def seedance_generate_video_from_image(
         Field(
             description=(
                 "Model version to use. "
+                "Use 'doubao-seedance-2-0-260128' for latest generation quality, "
+                "'doubao-seedance-2-0-fast-260128' for latest generation speed, "
                 "For image-to-video, consider 'doubao-seedance-1-0-lite-i2v-250428' "
                 "for lightweight I2V, or any Pro model for higher quality."
             )
