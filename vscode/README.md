@@ -15,8 +15,13 @@ can call it directly from chat.
 ## Quick Start
 
 1. **Install this extension.** VS Code registers the `seedance` MCP server automatically.
-2. **Get an API token** from [Ace Data Cloud](https://platform.acedata.cloud) → *API Keys*. New accounts include free trial credit.
-3. **Open Copilot Chat** in agent mode and ask for a video task — VS Code will prompt for the token the first time and store it securely.
+2. **Get an API key** from [Ace Data Cloud](https://platform.acedata.cloud/console/applications) (Applications → API Key). New accounts include free trial credit.
+3. **Open Copilot Chat** in agent mode and ask for a video task — the extension prompts for the API key the first time and stores it in the OS keychain via VS Code's `SecretStorage`.
+
+You can rotate or remove the API key any time from the command palette:
+
+- **Seedance MCP: Set Ace Data Cloud API Key**
+- **Seedance MCP: Clear Ace Data Cloud API Key**
 
 > The default config talks to the **hosted streamable-HTTP endpoint** at
 > `https://seedance.mcp.acedata.cloud/mcp` — no Python, no `uvx`, no local install needed.
@@ -50,7 +55,23 @@ From $0.15 per clip. Free trial credit on sign-up. See full pricing at [https://
 
 ## Configuration
 
-This extension contributes the following entry to your VS Code MCP config:
+This extension implements the `mcpServerDefinitionProviders` contribution point
+and registers a single hosted server with VS Code:
+
+```text
+Provider id : acedatacloud.seedance
+Server label: Seedance MCP
+Server URL  : https://seedance.mcp.acedata.cloud/mcp
+Transport   : Streamable HTTP
+Auth        : Bearer API key from VS Code SecretStorage (or $ACEDATACLOUD_API_TOKEN)
+```
+
+You don't need to edit `mcp.json` — the extension handles registration and
+token handling automatically. If you'd rather configure things by hand, the
+sections below show equivalent `mcp.json` snippets you can use **instead of**
+this extension.
+
+### Alternative: manual `mcp.json` (hosted)
 
 ```jsonc
 {
@@ -65,21 +86,17 @@ This extension contributes the following entry to your VS Code MCP config:
     {
       "type": "promptString",
       "id": "acedatacloud_api_token",
-      "description": "Ace Data Cloud API token",
+    "description": "Ace Data Cloud API key",
       "password": true
     }
   ]
 }
 ```
 
-VS Code will prompt for the token on first use and persist it in the OS
-secret store (Keychain / Credential Manager / libsecret).
-
 ### Alternative: local stdio (no network roundtrip)
 
-If you prefer running the server locally — for offline dev, air-gapped
-environments, or to pin to a specific PyPI version — install
-[`uv`](https://docs.astral.sh/uv/) and replace your `mcp.json` entry with:
+For offline dev, air-gapped environments, or pinning to a specific PyPI
+version, install [`uv`](https://docs.astral.sh/uv/) and use:
 
 ```jsonc
 {
@@ -95,12 +112,6 @@ environments, or to pin to a specific PyPI version — install
 ```
 
 `uvx` will download and run the latest [`mcp-seedance`](https://pypi.org/project/mcp-seedance/) on demand.
-
-### Alternative: OAuth via Dynamic Client Registration
-
-The hosted endpoint also accepts OAuth 2.1 with [DCR](https://datatracker.ietf.org/doc/html/rfc7591).
-Drop the `headers` and `inputs` blocks and VS Code will run the auth flow on
-first use (redirect URL `http://127.0.0.1:33418` or `https://vscode.dev/redirect`).
 
 ---
 
