@@ -10,12 +10,6 @@ from loguru import logger
 from core.config import settings
 from core.exceptions import SeedanceAPIError, SeedanceAuthError, SeedanceError, SeedanceTimeoutError
 
-# Dummy callback URL used to force the upstream API into async mode.
-# When present, the API returns immediately with a task_id instead of blocking
-# until generation completes. The health endpoint simply returns 200 OK and
-# discards the callback payload — it is never actually processed.
-_ASYNC_CALLBACK_URL = "https://api.acedata.cloud/health"
-
 # Context variable for per-request API token (used in HTTP/remote mode)
 _request_api_token: contextvars.ContextVar[str | None] = contextvars.ContextVar(
     "_request_api_token", default=None
@@ -67,7 +61,7 @@ class SeedanceClient:
         """Ensure long-running media operations are submitted asynchronously."""
         request_payload = dict(payload)
         if not request_payload.get("callback_url"):
-            request_payload["callback_url"] = _ASYNC_CALLBACK_URL
+            request_payload["async"] = True
         return request_payload
 
     def _handle_error_response(self, response: httpx.Response) -> None:

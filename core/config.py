@@ -23,9 +23,7 @@ class Settings:
 
     # Default Settings
     default_model: str = field(
-        default_factory=lambda: os.getenv(
-            "SEEDANCE_DEFAULT_MODEL", "doubao-seedance-1-0-pro-250528"
-        )
+        default_factory=lambda: os.getenv("SEEDANCE_DEFAULT_MODEL", "doubao-seedance-2-0-260128")
     )
     default_resolution: str = field(
         default_factory=lambda: os.getenv("SEEDANCE_DEFAULT_RESOLUTION", "720p")

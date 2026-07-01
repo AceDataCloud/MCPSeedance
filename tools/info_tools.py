@@ -18,27 +18,30 @@ async def seedance_list_models() -> str:
 
 | Model | Type | Strengths | Audio | Cost (720p/sec) |
 |-------|------|-----------|-------|-----------------|
-| doubao-seedance-2-0-260128 | 2.0 | Latest generation quality model | No | N/A |
-| doubao-seedance-2-0-fast-260128 | 2.0 Fast | Latest generation fast/cost-optimized model | No | N/A |
-| doubao-seedance-1-5-pro-251215 | Flagship | Newest, highest quality, audio support | Yes | ~$0.025 |
-| doubao-seedance-1-0-pro-250528 | Standard | Balanced quality and speed (default) | No | ~$0.049 |
+| doubao-seedance-2-0-260128 | 2.0 | Latest generation, highest quality, multimodal reference, up to 4k (default) | Yes | ~$0.146 |
+| doubao-seedance-2-0-fast-260128 | 2.0 Fast | Latest generation, faster, up to 720p | Yes | ~$0.117 |
+| doubao-seedance-2-0-mini-260615 | 2.0 Mini | Latest generation, lightweight, cheapest within 2.0, up to 720p | Yes | ~$0.073 |
+| doubao-seedance-1-5-pro-251215 | Flagship | 1.5, high quality, audio support | Yes | ~$0.025 |
+| doubao-seedance-1-0-pro-250528 | Standard | Balanced quality and speed | No | ~$0.049 |
 | doubao-seedance-1-0-pro-fast-251015 | Fast | Cost-optimized, faster generation | No | ~$0.014 |
 | doubao-seedance-1-0-lite-t2v-250428 | Lite T2V | Lightweight text-to-video | No | ~$0.033 |
 | doubao-seedance-1-0-lite-i2v-250428 | Lite I2V | Lightweight image-to-video | No | ~$0.033 |
 
 Model Selection Guide:
-- Latest quality: doubao-seedance-2-0-260128
+- Latest quality / default: doubao-seedance-2-0-260128 (up to 4k, multimodal reference)
 - Latest fast: doubao-seedance-2-0-fast-260128
-- Best quality: doubao-seedance-1-5-pro-251215 (newest flagship)
-- Best value: doubao-seedance-1-0-pro-250528 (standard, default)
-- Fastest/cheapest: doubao-seedance-1-0-pro-fast-251015
+- Latest lightweight / cheapest within 2.0: doubao-seedance-2-0-mini-260615
+- 1.5 flagship (audio): doubao-seedance-1-5-pro-251215
+- 1.0 standard: doubao-seedance-1-0-pro-250528
+- Fastest/cheapest 1.0: doubao-seedance-1-0-pro-fast-251015
 - Text-only lightweight: doubao-seedance-1-0-lite-t2v-250428
 - Image-to-video lightweight: doubao-seedance-1-0-lite-i2v-250428
 
 Notes:
-- Audio generation is only supported by the 1.5 Pro model
+- Audio generation (generate_audio) is supported by the 1.5 Pro and 2.0 series models
+- Seedance 2.0 adds multimodal reference inputs: real-person/character image, reference audio, reference video
 - 'flex' service tier offers 50% discount on all models
-- Resolution affects cost: 480p < 720p < 1080p
+- Resolution affects cost: 480p < 720p < 1080p < 4k ('4k' is doubao-seedance-2-0-260128 only; 2-0-fast / 2-0-mini max at 720p)
 """
 
 
@@ -59,6 +62,7 @@ async def seedance_list_resolutions() -> str:
 | 480p | Low resolution | Previews, drafts, cost savings |
 | 720p | HD (default) | General use, social media |
 | 1080p | Full HD | High-quality production |
+| 4k | Ultra HD | Highest detail (doubao-seedance-2-0-260128 only) |
 
 Available Aspect Ratios:
 

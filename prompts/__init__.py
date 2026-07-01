@@ -38,9 +38,10 @@ When the user wants to generate video, choose the appropriate tool based on thei
 ## Choosing the Right Model
 - **Latest generation quality:** `doubao-seedance-2-0-260128`
 - **Latest generation fast:** `doubao-seedance-2-0-fast-260128`
-- **Best quality + audio:** `doubao-seedance-1-5-pro-251215`
-- **Balanced (default):** `doubao-seedance-1-0-pro-250528`
-- **Fastest/cheapest:** `doubao-seedance-1-0-pro-fast-251015`
+- **Latest generation lightweight / cheapest within 2.0:** `doubao-seedance-2-0-mini-260615`
+- **1.5 flagship + audio:** `doubao-seedance-1-5-pro-251215`
+- **1.0 standard:** `doubao-seedance-1-0-pro-250528`
+- **Fastest/cheapest 1.0:** `doubao-seedance-1-0-pro-fast-251015`
 - **Lightweight T2V:** `doubao-seedance-1-0-lite-t2v-250428`
 - **Lightweight I2V:** `doubao-seedance-1-0-lite-i2v-250428`
 
@@ -54,12 +55,13 @@ When the user wants to generate video, choose the appropriate tool based on thei
 1. Video generation is async in MCP and should return quickly with a task_id
 2. After submission, poll with `seedance_get_task` until the final video URLs are available
 2. Default resolution is 720p, default ratio is 16:9
-3. Duration range: 2-12 seconds
-4. Only 1.5 Pro model supports audio generation
+3. Duration range: 2-15 seconds (Seedance 2.0 supports 4-15)
+4. Audio generation is supported by the 1.5 Pro and 2.0 series models
 5. Use 'flex' service_tier for 50% cost savings
 6. Use seed parameter for reproducible results
 7. reference_image_urls CANNOT be combined with first_frame/last_frame
-8. Use callback_url for async processing in production
+8. Seedance 2.0 also accepts reference audio/video (reference_audio_urls / reference_video_urls)
+9. Use callback_url for async processing in production
 """
 
 

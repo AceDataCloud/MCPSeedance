@@ -4,13 +4,14 @@ from typing import Literal
 
 # Seedance video models
 SeedanceModel = Literal[
+    "doubao-seedance-2-0-260128",
+    "doubao-seedance-2-0-fast-260128",
+    "doubao-seedance-2-0-mini-260615",
     "doubao-seedance-1-5-pro-251215",
     "doubao-seedance-1-0-pro-250528",
     "doubao-seedance-1-0-pro-fast-251015",
     "doubao-seedance-1-0-lite-t2v-250428",
     "doubao-seedance-1-0-lite-i2v-250428",
-    "doubao-seedance-2-0-260128",
-    "doubao-seedance-2-0-fast-260128",
 ]
 
 # Video aspect ratios
@@ -29,6 +30,7 @@ Resolution = Literal[
     "480p",
     "720p",
     "1080p",
+    "4k",
 ]
 
 # Service tiers
@@ -41,6 +43,8 @@ ServiceTier = Literal[
 ContentType = Literal[
     "text",
     "image_url",
+    "audio_url",
+    "video_url",
 ]
 
 # Image roles for content items
@@ -51,7 +55,7 @@ ImageRole = Literal[
 ]
 
 # Default values
-DEFAULT_MODEL: SeedanceModel = "doubao-seedance-1-0-pro-250528"
+DEFAULT_MODEL: SeedanceModel = "doubao-seedance-2-0-260128"
 DEFAULT_RESOLUTION: Resolution = "720p"
 DEFAULT_RATIO: AspectRatio = "16:9"
 DEFAULT_DURATION: int = 5

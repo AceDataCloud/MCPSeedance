@@ -39,11 +39,14 @@ async def seedance_generate_video(
         Field(
             description=(
                 "Model version to use. Options: "
-                "'doubao-seedance-2-0-260128' (latest generation quality model), "
-                "'doubao-seedance-2-0-fast-260128' (latest generation fast model), "
-                "'doubao-seedance-1-5-pro-251215' (newest flagship, supports audio), "
-                "'doubao-seedance-1-0-pro-250528' (standard, default), "
-                "'doubao-seedance-1-0-pro-fast-251015' (fast, cost-optimized), "
+                "'doubao-seedance-2-0-260128' (latest generation, highest quality, "
+                "supports 4k and multimodal reference, default), "
+                "'doubao-seedance-2-0-fast-260128' (latest generation, faster, up to 720p), "
+                "'doubao-seedance-2-0-mini-260615' (latest generation, lightweight, "
+                "cheapest within the 2.0 series, up to 720p), "
+                "'doubao-seedance-1-5-pro-251215' (1.5 flagship, supports audio), "
+                "'doubao-seedance-1-0-pro-250528' (1.0 standard), "
+                "'doubao-seedance-1-0-pro-fast-251015' (1.0 fast, cost-optimized), "
                 "'doubao-seedance-1-0-lite-t2v-250428' (lightweight text-to-video), "
                 "'doubao-seedance-1-0-lite-i2v-250428' (lightweight image-to-video)."
             )
@@ -51,7 +54,13 @@ async def seedance_generate_video(
     ] = DEFAULT_MODEL,
     resolution: Annotated[
         Resolution,
-        Field(description=("Video resolution. Options: '480p', '720p' (default), '1080p'.")),
+        Field(
+            description=(
+                "Video resolution. Options: '480p', '720p' (default), '1080p', '4k'. "
+                "'4k' is supported only by 'doubao-seedance-2-0-260128'; "
+                "'2-0-fast' and '2-0-mini' max out at '720p'."
+            )
+        ),
     ] = DEFAULT_RESOLUTION,
     ratio: Annotated[
         AspectRatio,
@@ -67,11 +76,11 @@ async def seedance_generate_video(
         int | None,
         Field(
             description=(
-                "Video duration in seconds. Range: 2-12. Default is 5. "
-                "Mutually exclusive with 'frames'."
+                "Video duration in seconds. Range: 2-15 (Seedance 2.0 supports 4-15). "
+                "Default is 5. Mutually exclusive with 'frames'."
             ),
             ge=2,
-            le=12,
+            le=15,
         ),
     ] = None,
     frames: Annotated[
@@ -79,7 +88,7 @@ async def seedance_generate_video(
         Field(
             description=(
                 "Frame count for the generated video. "
-                "Must satisfy 25+4n (e.g. 29, 33, 37, ..., 289). "
+                "Must satisfy 25+4n (e.g. 29, 33, 37, ..., 361). "
                 "Mutually exclusive with 'duration'."
             ),
         ),
@@ -89,7 +98,8 @@ async def seedance_generate_video(
         Field(
             description=(
                 "If true, generate audio along with the video. "
-                "Only supported by 'doubao-seedance-1-5-pro-251215' model. "
+                "Supported by 'doubao-seedance-1-5-pro-251215' and the "
+                "'doubao-seedance-2-0' series; other models ignore it. "
                 "Approximately doubles the cost. Default is false."
             )
         ),
@@ -235,8 +245,28 @@ async def seedance_generate_video_from_image(
         Field(
             description=(
                 "List of reference image URLs for style/content guidance. "
+                "For the Seedance 2.0 series these can be real-person / character "
+                "references that keep the subject consistent (up to 9). "
                 "These images influence the look but are not used as frames. "
                 "Cannot be combined with first_frame_url or last_frame_url."
+            )
+        ),
+    ] = [],  # noqa: B006
+    reference_audio_urls: Annotated[
+        list[str],
+        Field(
+            description=(
+                "Seedance 2.0 only. Reference audio URLs (up to 3) for voice timbre / "
+                "background music. Ignored by 1.x models."
+            )
+        ),
+    ] = [],  # noqa: B006
+    reference_video_urls: Annotated[
+        list[str],
+        Field(
+            description=(
+                "Seedance 2.0 only. Reference video URLs (up to 3) for subject, camera "
+                "movement, motion or overall style. Ignored by 1.x models."
             )
         ),
     ] = [],  # noqa: B006
@@ -245,16 +275,22 @@ async def seedance_generate_video_from_image(
         Field(
             description=(
                 "Model version to use. "
-                "Use 'doubao-seedance-2-0-260128' for latest generation quality, "
-                "'doubao-seedance-2-0-fast-260128' for latest generation speed, "
-                "For image-to-video, consider 'doubao-seedance-1-0-lite-i2v-250428' "
-                "for lightweight I2V, or any Pro model for higher quality."
+                "Use 'doubao-seedance-2-0-260128' (default) for latest-generation quality "
+                "and multimodal reference, 'doubao-seedance-2-0-fast-260128' or "
+                "'doubao-seedance-2-0-mini-260615' for faster/cheaper 2.0, or a 1.x model "
+                "such as 'doubao-seedance-1-0-lite-i2v-250428' for lightweight I2V."
             )
         ),
     ] = DEFAULT_MODEL,
     resolution: Annotated[
         Resolution,
-        Field(description="Video resolution. Options: '480p', '720p', '1080p'."),
+        Field(
+            description=(
+                "Video resolution. Options: '480p', '720p', '1080p', '4k'. "
+                "'4k' is supported only by 'doubao-seedance-2-0-260128'; "
+                "'2-0-fast' and '2-0-mini' max out at '720p'."
+            )
+        ),
     ] = DEFAULT_RESOLUTION,
     ratio: Annotated[
         AspectRatio,
@@ -264,11 +300,11 @@ async def seedance_generate_video_from_image(
         int | None,
         Field(
             description=(
-                "Video duration in seconds. Range: 2-12. Default is 5. "
-                "Mutually exclusive with 'frames'."
+                "Video duration in seconds. Range: 2-15 (Seedance 2.0 supports 4-15). "
+                "Default is 5. Mutually exclusive with 'frames'."
             ),
             ge=2,
-            le=12,
+            le=15,
         ),
     ] = None,
     frames: Annotated[
@@ -276,7 +312,7 @@ async def seedance_generate_video_from_image(
         Field(
             description=(
                 "Frame count for the generated video. "
-                "Must satisfy 25+4n (e.g. 29, 33, 37, ..., 289). "
+                "Must satisfy 25+4n (e.g. 29, 33, 37, ..., 361). "
                 "Mutually exclusive with 'duration'."
             ),
         ),
@@ -285,7 +321,8 @@ async def seedance_generate_video_from_image(
         bool,
         Field(
             description=(
-                "If true, generate audio. Only supported by 1.5 Pro model. Default is false."
+                "If true, generate audio. Supported by 'doubao-seedance-1-5-pro-251215' "
+                "and the 'doubao-seedance-2-0' series. Default is false."
             )
         ),
     ] = False,
@@ -337,10 +374,17 @@ async def seedance_generate_video_from_image(
     Returns:
         Task ID and generated video information including URLs and metadata.
     """
-    if not first_frame_url and not last_frame_url and not reference_image_urls:
+    if (
+        not first_frame_url
+        and not last_frame_url
+        and not reference_image_urls
+        and not reference_audio_urls
+        and not reference_video_urls
+    ):
         return (
             "Error: At least one of first_frame_url, last_frame_url, "
-            "or reference_image_urls must be provided."
+            "reference_image_urls, reference_audio_urls, or reference_video_urls "
+            "must be provided."
         )
 
     if reference_image_urls and (first_frame_url or last_frame_url):
@@ -380,6 +424,12 @@ async def seedance_generate_video_from_image(
                 "role": "reference_image",
             }
         )
+
+    for audio_url in reference_audio_urls:
+        content.append({"type": "audio_url", "audio_url": {"url": audio_url}})
+
+    for video_url in reference_video_urls:
+        content.append({"type": "video_url", "video_url": {"url": video_url}})
 
     payload: dict[str, Any] = {
         "model": model,

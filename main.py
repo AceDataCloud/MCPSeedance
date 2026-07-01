@@ -60,7 +60,7 @@ Examples:
 
 Environment Variables:
   ACEDATACLOUD_API_TOKEN        API token from AceDataCloud (required)
-  SEEDANCE_DEFAULT_MODEL        Default model (default: doubao-seedance-1-0-pro-250528)
+  SEEDANCE_DEFAULT_MODEL        Default model (default: doubao-seedance-2-0-260128)
   SEEDANCE_DEFAULT_RESOLUTION   Default resolution (default: 720p)
   SEEDANCE_DEFAULT_RATIO        Default aspect ratio (default: 16:9)
   SEEDANCE_DEFAULT_DURATION     Default duration in seconds (default: 5)

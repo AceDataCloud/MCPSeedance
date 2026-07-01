@@ -42,7 +42,7 @@ class TestSeedanceClient:
     ) -> None:
         """Test async submission injects an internal callback when missing."""
         payload = test_client._with_async_callback({"model": "doubao-seedance-1-0-pro-250528"})
-        assert payload["callback_url"] == "https://api.acedata.cloud/health"
+        assert payload["async"] is True
 
     def test_with_async_callback_preserves_explicit_callback(
         self, test_client: SeedanceClient

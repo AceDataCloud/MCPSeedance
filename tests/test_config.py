@@ -13,7 +13,7 @@ def test_settings_default_values() -> None:
 
         settings = Settings()
         assert settings.api_base_url == "https://api.acedata.cloud"
-        assert settings.default_model == "doubao-seedance-1-0-pro-250528"
+        assert settings.default_model == "doubao-seedance-2-0-260128"
         assert settings.default_resolution == "720p"
         assert settings.default_ratio == "16:9"
         assert settings.default_duration == 5
