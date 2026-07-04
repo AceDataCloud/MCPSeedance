@@ -8,10 +8,10 @@ Flow:
 2. MCP server redirects to auth.acedata.cloud/oauth2/authorize (consent page)
 3. User logs in (if needed), sees consent page, approves
 4. auth.acedata.cloud issues an authorization code, redirects to /oauth/callback
-5. MCP server exchanges code for JWT + refresh_token via POST /oauth2/token (with PKCE)
-6. MCP server uses JWT to fetch/create user's API credential
-7. Issues the credential token as the OAuth access_token
-8. On refresh: calls auth.acedata.cloud with stored refresh_token → new JWT → re-fetch credential
+5. MCP server exchanges code for a JWT via POST /oauth2/token (with PKCE)
+6. MCP server uses the JWT to fetch/create the user's API credential
+7. Issues the durable credential token as the OAuth access_token — the credential
+   does not expire, so there is no refresh flow and restarts never force re-auth
 """
 
 import base64
@@ -48,19 +48,17 @@ def _normalize_scopes(scopes: list[str] | None) -> list[str]:
 class AceDataCloudOAuthProvider:
     """OAuth provider that delegates authentication to AceDataCloud platform.
 
-    Refresh tokens are backed by auth.acedata.cloud — pod restarts don't break
-    refresh because the real refresh_token lives at the authorization server.
+    The access token is the user's durable, non-expiring api.acedata.cloud
+    credential. There is no refresh flow — the credential never expires, so pod
+    restarts/redeploys never force re-authorization.
     """
 
     def __init__(self) -> None:
         self._clients: dict[str, OAuthClientInformationFull] = {}
         self._auth_codes: dict[
-            str, tuple[AuthorizationCode, str, str | None]
-        ] = {}  # code → (AuthCode, api_token, auth_refresh_token)
+            str, tuple[AuthorizationCode, str]
+        ] = {}  # code → (AuthCode, api_token)
         self._access_tokens: dict[str, AccessToken] = {}
-        self._refresh_tokens: dict[str, RefreshToken] = {}
-        # Maps MCP refresh_token → auth.acedata.cloud refresh_token (the real one)
-        self._auth_refresh_tokens: dict[str, str] = {}
         self._pending_auth: dict[str, dict] = {}  # mcp_state → {client_id, params}
 
     async def get_client(self, client_id: str) -> OAuthClientInformationFull | None:
@@ -68,13 +66,13 @@ class AceDataCloudOAuthProvider:
         if client:
             return client
         # After pod restart, registered clients are forgotten. Synthesize so
-        # token/refresh calls don't get a hard 401 — real auth is via
-        # auth.acedata.cloud refresh_token validation.
+        # token calls don't get a hard 401 — the access token is a durable
+        # api.acedata.cloud credential validated upstream.
         synthetic = OAuthClientInformationFull(
             client_id=client_id,
             redirect_uris=[AnyUrl("https://auth.acedata.cloud/user/connections")],
             token_endpoint_auth_method="none",
-            grant_types=["authorization_code", "refresh_token"],
+            grant_types=["authorization_code"],
             response_types=["code"],
         )
         self._clients[client_id] = synthetic
@@ -111,12 +109,12 @@ class AceDataCloudOAuthProvider:
 
         callback_url = f"{settings.server_url}/oauth/callback"
 
-        # Request offline_access so auth.acedata.cloud returns a refresh_token
+        # Only need profile + platform to fetch the user's durable credential.
         auth_params = {
             "client_id": settings.oauth_client_id,
             "redirect_uri": callback_url,
             "response_type": "code",
-            "scope": "profile platform offline_access",
+            "scope": "profile platform",
             "state": mcp_state,
             "code_challenge": auth_code_challenge,
             "code_challenge_method": "S256",
@@ -149,7 +147,6 @@ class AceDataCloudOAuthProvider:
                 )
 
             jwt_token = token_data["access_token"]
-            auth_refresh = token_data.get("refresh_token")  # from auth.acedata.cloud
 
             # Fetch user's API credential using the JWT
             api_token = await self._get_user_credential(jwt_token)
@@ -174,7 +171,7 @@ class AceDataCloudOAuthProvider:
                 redirect_uri_provided_explicitly=pending["redirect_uri_provided_explicitly"],
                 resource=pending.get("resource"),
             )
-            self._auth_codes[auth_code_str] = (auth_code, api_token, auth_refresh)
+            self._auth_codes[auth_code_str] = (auth_code, api_token)
 
             # Redirect back to Claude with the MCP auth code
             redirect_uri = pending["redirect_uri"]
@@ -211,11 +208,11 @@ class AceDataCloudOAuthProvider:
         data = self._auth_codes.pop(authorization_code.code, None)
         if not data:
             raise ValueError("Authorization code not found or already used")
-        _, api_token, auth_refresh = data
+        _, api_token = data
 
         client_id = client.client_id or ""
 
-        # Store access token
+        # The access token is the user's durable, non-expiring credential.
         self._access_tokens[api_token] = AccessToken(
             token=api_token,
             client_id=client_id,
@@ -223,129 +220,34 @@ class AceDataCloudOAuthProvider:
             expires_at=None,
         )
 
-        # Issue MCP refresh_token backed by auth.acedata.cloud's refresh_token
-        mcp_refresh_str = secrets.token_urlsafe(48)
-        self._refresh_tokens[mcp_refresh_str] = RefreshToken(
-            token=mcp_refresh_str,
-            client_id=client_id,
-            scopes=_normalize_scopes(authorization_code.scopes),
-        )
-        if auth_refresh:
-            self._auth_refresh_tokens[mcp_refresh_str] = auth_refresh
-
-        logger.info(
-            f"OAuth token exchange: issued access token for client {client_id} "
-            f"(auth_refresh={'yes' if auth_refresh else 'no'})"
-        )
+        logger.info(f"OAuth token exchange: issued durable credential for client {client_id}")
         return OAuthToken(
             access_token=api_token,
             token_type="Bearer",
             scope=" ".join(_normalize_scopes(authorization_code.scopes)),
-            refresh_token=mcp_refresh_str if auth_refresh else None,
         )
 
     async def load_refresh_token(
         self,
-        client: OAuthClientInformationFull,
-        refresh_token: str,
+        client: OAuthClientInformationFull,  # noqa: ARG002
+        refresh_token: str,  # noqa: ARG002
     ) -> RefreshToken | None:
-        stored = self._refresh_tokens.get(refresh_token)
-        if stored:
-            return stored
-        # After pod restart, in-memory refresh tokens are lost. Synthesize so
-        # exchange_refresh_token can attempt auth.acedata.cloud refresh.
-        return RefreshToken(
-            token=refresh_token,
-            client_id=client.client_id or "",
-            scopes=[MCP_ACCESS_SCOPE],
-        )
+        # No refresh flow — the access token is a durable, non-expiring credential.
+        return None
 
     async def exchange_refresh_token(
         self,
-        client: OAuthClientInformationFull,
-        refresh_token: RefreshToken,
-        scopes: list[str],
+        client: OAuthClientInformationFull,  # noqa: ARG002
+        refresh_token: RefreshToken,  # noqa: ARG002
+        scopes: list[str],  # noqa: ARG002
     ) -> OAuthToken:
-        """Refresh by calling auth.acedata.cloud with the stored auth refresh_token."""
-        client_id = client.client_id or ""
-        old_mcp_refresh = refresh_token.token
+        from mcp.server.auth.provider import TokenError
 
-        # Get the auth.acedata.cloud refresh_token mapped to this MCP refresh
-        auth_refresh = self._auth_refresh_tokens.pop(old_mcp_refresh, None)
-        self._refresh_tokens.pop(old_mcp_refresh, None)
-
-        if not auth_refresh:
-            # Post-restart: no mapping. Fall back to in-memory access_token if available.
-            for token, at in self._access_tokens.items():
-                if at.client_id == client_id:
-                    new_mcp_refresh = secrets.token_urlsafe(48)
-                    self._refresh_tokens[new_mcp_refresh] = RefreshToken(
-                        token=new_mcp_refresh,
-                        client_id=client_id,
-                        scopes=_normalize_scopes(scopes or refresh_token.scopes),
-                    )
-                    return OAuthToken(
-                        access_token=token,
-                        token_type="Bearer",
-                        scope=" ".join(_normalize_scopes(scopes or refresh_token.scopes)),
-                        refresh_token=new_mcp_refresh,
-                    )
-            from mcp.server.auth.provider import TokenError
-
-            raise TokenError(
-                error="invalid_grant",
-                error_description="Refresh token expired, please re-authorize",
-            )
-
-        # Call auth.acedata.cloud to refresh the JWT
-        token_data = await self._refresh_auth_token(auth_refresh)
-        if not token_data:
-            from mcp.server.auth.provider import TokenError
-
-            raise TokenError(
-                error="invalid_grant",
-                error_description="auth.acedata.cloud refresh failed, please re-authorize",
-            )
-
-        new_jwt = token_data["access_token"]
-        new_auth_refresh = token_data.get("refresh_token", auth_refresh)
-
-        # Use new JWT to fetch/verify the user's API credential
-        api_token = await self._get_user_credential(new_jwt)
-        if not api_token:
-            from mcp.server.auth.provider import TokenError
-
-            raise TokenError(
-                error="invalid_grant",
-                error_description="Failed to fetch API credential after refresh",
-            )
-
-        # Remove old access_token for this client, store new one
-        for token, at in list(self._access_tokens.items()):
-            if at.client_id == client_id:
-                del self._access_tokens[token]
-        self._access_tokens[api_token] = AccessToken(
-            token=api_token,
-            client_id=client_id,
-            scopes=_normalize_scopes(scopes or refresh_token.scopes),
-            expires_at=None,
-        )
-
-        # Issue new MCP refresh_token mapped to the new auth refresh_token
-        new_mcp_refresh = secrets.token_urlsafe(48)
-        self._refresh_tokens[new_mcp_refresh] = RefreshToken(
-            token=new_mcp_refresh,
-            client_id=client_id,
-            scopes=_normalize_scopes(scopes or refresh_token.scopes),
-        )
-        self._auth_refresh_tokens[new_mcp_refresh] = new_auth_refresh
-
-        logger.info(f"OAuth refresh: issued new access token for client {client_id}")
-        return OAuthToken(
-            access_token=api_token,
-            token_type="Bearer",
-            scope=" ".join(_normalize_scopes(scopes or refresh_token.scopes)),
-            refresh_token=new_mcp_refresh,
+        # Tokens never expire, so there is nothing to refresh. An old client that
+        # still holds a pre-migration refresh_token gets a clean re-auth prompt.
+        raise TokenError(
+            error="invalid_grant",
+            error_description="This server issues non-expiring tokens; refresh is not supported.",
         )
 
     async def load_access_token(self, token: str) -> AccessToken | None:
@@ -369,9 +271,6 @@ class AceDataCloudOAuthProvider:
     async def revoke_token(self, token: AccessToken | RefreshToken) -> None:
         if isinstance(token, AccessToken):
             self._access_tokens.pop(token.token, None)
-        elif isinstance(token, RefreshToken):
-            self._auth_refresh_tokens.pop(token.token, None)
-            self._refresh_tokens.pop(token.token, None)
         logger.info(f"Revoked token: {token.token[:8]}...")
 
     # --- Internal helpers ---
@@ -432,34 +331,6 @@ class AceDataCloudOAuthProvider:
                     )
         except Exception:
             logger.exception("OAuth token exchange error")
-        return None
-
-    async def _refresh_auth_token(self, auth_refresh_token: str) -> dict[str, str] | None:
-        """Call auth.acedata.cloud to refresh the JWT using the auth refresh_token."""
-        token_url = f"{settings.auth_base_url}/oauth2/token"
-        try:
-            async with httpx.AsyncClient(timeout=30) as client:
-                response = await client.post(
-                    token_url,
-                    data={
-                        "grant_type": "refresh_token",
-                        "refresh_token": auth_refresh_token,
-                        "client_id": settings.oauth_client_id,
-                    },
-                )
-                if response.status_code == 200:
-                    data: dict[str, str] = response.json()
-                    if data.get("access_token"):
-                        logger.info("auth.acedata.cloud refresh OK, new JWT issued")
-                        return data
-                    logger.error(f"Auth refresh 200 but no access_token: {list(data.keys())}")
-                else:
-                    logger.warning(
-                        f"auth.acedata.cloud refresh failed: {response.status_code} "
-                        f"{response.text[:200]}"
-                    )
-        except Exception:
-            logger.exception("auth.acedata.cloud refresh error")
         return None
 
     async def _get_user_credential(self, jwt_token: str) -> str | None:
