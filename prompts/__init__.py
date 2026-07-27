@@ -54,10 +54,9 @@ When the user wants to generate video, choose the appropriate tool based on thei
 ## Important Notes:
 1. Video generation is async in MCP and should return quickly with a task_id
 2. After submission, poll with `seedance_get_task` until the final video URLs are available
-2. Default resolution is 720p, default ratio is 16:9
-3. Duration range: 2-15 seconds (Seedance 2.0 supports 4-15)
-4. Audio generation is supported by the 1.5 Pro and 2.0 series models
-5. Use 'flex' service_tier for 50% cost savings
+3. Default resolution is 720p, default ratio is 16:9
+4. Duration range: 2-15 seconds (Seedance 2.0 supports 4-15)
+5. Audio generation is supported by the 1.5 Pro and 2.0 series models
 6. Use seed parameter for reproducible results
 7. reference_image_urls CANNOT be combined with first_frame/last_frame
 8. Seedance 2.0 also accepts reference audio/video (reference_audio_urls / reference_video_urls)
@@ -98,7 +97,7 @@ def seedance_workflow_examples() -> str:
 
 ## Workflow 6: Budget-Friendly Generation
 1. User wants cheap/fast results
-2. Call `seedance_generate_video(prompt="...", model="doubao-seedance-1-0-pro-fast-251015", service_tier="flex", resolution="480p")`
+2. Call `seedance_generate_video(prompt="...", model="doubao-seedance-1-0-pro-fast-251015", resolution="480p")`
 3. Return task_id and video URL
 
 ## Workflow 7: Mobile-First Content

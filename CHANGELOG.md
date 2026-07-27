@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- `service_tier` parameter — removed from the API spec; the field was ignored and the advertised "flex 50% discount" never existed
+
 ## [0.1.0] - 2026-03-08
 
 ### Added

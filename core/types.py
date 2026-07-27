@@ -33,12 +33,6 @@ Resolution = Literal[
     "4k",
 ]
 
-# Service tiers
-ServiceTier = Literal[
-    "default",
-    "flex",
-]
-
 # Content item types
 ContentType = Literal[
     "text",

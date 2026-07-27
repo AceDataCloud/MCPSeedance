@@ -40,7 +40,6 @@ Model Selection Guide:
 Notes:
 - Audio generation (generate_audio) is supported by the 1.5 Pro and 2.0 series models
 - Seedance 2.0 adds multimodal reference inputs: real-person/character image, reference audio, reference video
-- 'flex' service tier offers 50% discount on all models
 - Resolution affects cost: 480p < 720p < 1080p < 4k ('4k' is doubao-seedance-2-0-260128 only; 2-0-fast / 2-0-mini max at 720p)
 """
 
@@ -127,7 +126,7 @@ Workflow Examples:
    seedance_generate_video (with callback_url) -> webhook notification
 
 6. Budget-friendly generation:
-   seedance_generate_video (with model=fast, service_tier='flex')
+   seedance_generate_video (with model=fast, resolution='480p')
 
 7. High-quality with audio:
    seedance_generate_video (with model=1.5-pro, generate_audio=true)
@@ -137,7 +136,6 @@ Tips:
 - Include motion descriptions: "walking", "flying", "zooming in"
 - Specify style: "cinematic", "realistic", "artistic", "anime"
 - 1.5 Pro model supports audio generation (~2x cost)
-- Use 'flex' service tier for 50% cost savings (slower processing)
 - Use seed parameter for reproducible results
 - Use return_last_frame=true when planning to extend videos
 """

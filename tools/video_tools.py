@@ -14,7 +14,6 @@ from core.types import (
     AspectRatio,
     Resolution,
     SeedanceModel,
-    ServiceTier,
 )
 from core.utils import format_video_result
 
@@ -104,15 +103,6 @@ async def seedance_generate_video(
             )
         ),
     ] = False,
-    service_tier: Annotated[
-        ServiceTier,
-        Field(
-            description=(
-                "Service tier. 'default' for standard processing, "
-                "'flex' for 50%% cheaper but slower processing. Default is 'default'."
-            )
-        ),
-    ] = "default",
     seed: Annotated[
         int,
         Field(
@@ -183,7 +173,6 @@ async def seedance_generate_video(
         "content": [{"type": "text", "text": prompt}],
         "resolution": resolution,
         "ratio": ratio,
-        "service_tier": service_tier,
         "camerafixed": camera_fixed,
         "watermark": watermark,
         "return_last_frame": return_last_frame,
@@ -326,12 +315,6 @@ async def seedance_generate_video_from_image(
             )
         ),
     ] = False,
-    service_tier: Annotated[
-        ServiceTier,
-        Field(
-            description=("Service tier. 'default' or 'flex' (50%% cheaper). Default is 'default'.")
-        ),
-    ] = "default",
     seed: Annotated[
         int,
         Field(
@@ -436,7 +419,6 @@ async def seedance_generate_video_from_image(
         "content": content,
         "resolution": resolution,
         "ratio": ratio,
-        "service_tier": service_tier,
         "return_last_frame": return_last_frame,
         "execution_expires_after": execution_expires_after,
     }
