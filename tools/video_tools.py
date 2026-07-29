@@ -75,10 +75,11 @@ async def seedance_generate_video(
         int | None,
         Field(
             description=(
-                "Video duration in seconds. Range: 2-15 (Seedance 2.0 supports 4-15). "
+                "Video duration in seconds. 1.0 series: 2–12; 1.5 Pro: 4–12; "
+                "2.0 series: 4–15. Use -1 for auto-duration (1.5 Pro and 2.0 series only). "
                 "Default is 5. Mutually exclusive with 'frames'."
             ),
-            ge=2,
+            ge=-1,
             le=15,
         ),
     ] = None,
@@ -86,8 +87,8 @@ async def seedance_generate_video(
         int | None,
         Field(
             description=(
-                "Frame count for the generated video. "
-                "Must satisfy 25+4n (e.g. 29, 33, 37, ..., 361). "
+                "Frame count for the generated video (1.0 series only). "
+                "Must satisfy 25+4n (e.g. 29, 33, 37, ..., 289). "
                 "Mutually exclusive with 'duration'."
             ),
         ),
@@ -289,10 +290,11 @@ async def seedance_generate_video_from_image(
         int | None,
         Field(
             description=(
-                "Video duration in seconds. Range: 2-15 (Seedance 2.0 supports 4-15). "
+                "Video duration in seconds. 1.0 series: 2–12; 1.5 Pro: 4–12; "
+                "2.0 series: 4–15. Use -1 for auto-duration (1.5 Pro and 2.0 series only). "
                 "Default is 5. Mutually exclusive with 'frames'."
             ),
-            ge=2,
+            ge=-1,
             le=15,
         ),
     ] = None,
@@ -300,8 +302,8 @@ async def seedance_generate_video_from_image(
         int | None,
         Field(
             description=(
-                "Frame count for the generated video. "
-                "Must satisfy 25+4n (e.g. 29, 33, 37, ..., 361). "
+                "Frame count for the generated video (1.0 series only). "
+                "Must satisfy 25+4n (e.g. 29, 33, 37, ..., 289). "
                 "Mutually exclusive with 'duration'."
             ),
         ),
