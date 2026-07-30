@@ -91,6 +91,8 @@ async def seedance_generate_video(
                 "Must satisfy 25+4n (e.g. 29, 33, 37, ..., 289). "
                 "Mutually exclusive with 'duration'."
             ),
+            ge=29,
+            le=289,
         ),
     ] = None,
     generate_audio: Annotated[
@@ -306,6 +308,8 @@ async def seedance_generate_video_from_image(
                 "Must satisfy 25+4n (e.g. 29, 33, 37, ..., 289). "
                 "Mutually exclusive with 'duration'."
             ),
+            ge=29,
+            le=289,
         ),
     ] = None,
     generate_audio: Annotated[
