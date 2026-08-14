@@ -12,6 +12,8 @@ from core.types import (
     DEFAULT_RATIO,
     DEFAULT_RESOLUTION,
     AspectRatio,
+    OmniReferenceTaskType,
+    OutputFormat,
     Resolution,
     SeedanceModel,
 )
@@ -38,8 +40,9 @@ async def seedance_generate_video(
         Field(
             description=(
                 "Model version to use. Options: "
-                "'doubao-seedance-2-0-260128' (latest generation, highest quality, "
-                "supports 4k and multimodal reference, default), "
+                "'doubao-seedance-2-5-260628' (latest flagship, up to 30 seconds, "
+                "multimodal reference, edit/extend, default), "
+                "'doubao-seedance-2-0-260128' (highest resolution, supports 4k), "
                 "'doubao-seedance-2-0-fast-260128' (latest generation, faster, up to 720p), "
                 "'doubao-seedance-2-0-mini-260615' (latest generation, lightweight, "
                 "cheapest within the 2.0 series, up to 720p), "
@@ -76,11 +79,11 @@ async def seedance_generate_video(
         Field(
             description=(
                 "Video duration in seconds. 1.0 series: 2–12; 1.5 Pro: 4–12; "
-                "2.0 series: 4–15. Use -1 for auto-duration (1.5 Pro and 2.0 series only). "
+                "2.0 series: 4–15; 2.5: 4–30. Use -1 for auto-duration (1.5 Pro and 2.x). "
                 "Default is 5. Mutually exclusive with 'frames'."
             ),
             ge=-1,
-            le=15,
+            le=30,
         ),
     ] = None,
     frames: Annotated[
@@ -135,6 +138,14 @@ async def seedance_generate_video(
             )
         ),
     ] = False,
+    output_format: Annotated[
+        OutputFormat | None,
+        Field(description="Seedance 2.5 output format: mp4 or mov."),
+    ] = None,
+    tools: Annotated[
+        list[dict[str, Any]] | None,
+        Field(description="Optional Seedance 2.5 tool configuration objects."),
+    ] = None,
     callback_url: Annotated[
         str | None,
         Field(
@@ -192,6 +203,12 @@ async def seedance_generate_video(
 
     if generate_audio:
         payload["generate_audio"] = True
+
+    if output_format:
+        payload["output_format"] = output_format
+
+    if tools:
+        payload["tools"] = tools
 
     if callback_url:
         payload["callback_url"] = callback_url
@@ -293,11 +310,11 @@ async def seedance_generate_video_from_image(
         Field(
             description=(
                 "Video duration in seconds. 1.0 series: 2–12; 1.5 Pro: 4–12; "
-                "2.0 series: 4–15. Use -1 for auto-duration (1.5 Pro and 2.0 series only). "
+                "2.0 series: 4–15; 2.5: 4–30. Use -1 for auto-duration (1.5 Pro and 2.x). "
                 "Default is 5. Mutually exclusive with 'frames'."
             ),
             ge=-1,
-            le=15,
+            le=30,
         ),
     ] = None,
     frames: Annotated[
@@ -317,7 +334,7 @@ async def seedance_generate_video_from_image(
         Field(
             description=(
                 "If true, generate audio. Supported by 'doubao-seedance-1-5-pro-251215' "
-                "and the 'doubao-seedance-2-0' series. Default is false."
+                "and the Seedance 2.x series. Default is false."
             )
         ),
     ] = False,
@@ -335,6 +352,18 @@ async def seedance_generate_video_from_image(
             description=("If true, return the last frame of the generated video. Default is false.")
         ),
     ] = False,
+    omni_reference_task_type: Annotated[
+        OmniReferenceTaskType | None,
+        Field(description="Seedance 2.5 task type: auto, edit, or extend."),
+    ] = None,
+    output_format: Annotated[
+        OutputFormat | None,
+        Field(description="Seedance 2.5 output format: mp4 or mov."),
+    ] = None,
+    tools: Annotated[
+        list[dict[str, Any]] | None,
+        Field(description="Optional Seedance 2.5 tool configuration objects."),
+    ] = None,
     callback_url: Annotated[
         str | None,
         Field(description="Webhook callback URL for asynchronous notifications."),
@@ -415,10 +444,14 @@ async def seedance_generate_video_from_image(
         )
 
     for audio_url in reference_audio_urls:
-        content.append({"type": "audio_url", "audio_url": {"url": audio_url}})
+        content.append(
+            {"type": "audio_url", "audio_url": {"url": audio_url}, "role": "reference_audio"}
+        )
 
     for video_url in reference_video_urls:
-        content.append({"type": "video_url", "video_url": {"url": video_url}})
+        content.append(
+            {"type": "video_url", "video_url": {"url": video_url}, "role": "reference_video"}
+        )
 
     payload: dict[str, Any] = {
         "model": model,
@@ -439,6 +472,15 @@ async def seedance_generate_video_from_image(
 
     if generate_audio:
         payload["generate_audio"] = True
+
+    if omni_reference_task_type:
+        payload["omni_reference_task_type"] = omni_reference_task_type
+
+    if output_format:
+        payload["output_format"] = output_format
+
+    if tools:
+        payload["tools"] = tools
 
     if callback_url:
         payload["callback_url"] = callback_url

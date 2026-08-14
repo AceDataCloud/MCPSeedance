@@ -13,11 +13,12 @@ async def seedance_list_models() -> str:
     Returns:
         Table of all models with descriptions, capabilities, and pricing.
     """
-    # Last updated: 2026-04-05
+    # Last updated: 2026-08-14
     return """Available Seedance Models:
 
-| Model | Type | Strengths | Audio | Cost (720p/sec) |
-|-------|------|-----------|-------|-----------------|
+| Model | Type | Strengths | Audio | Credits (720p/sec) |
+|-------|------|-----------|-------|--------------------|
+| doubao-seedance-2-5-260628 | 2.5 | Latest flagship, up to 30s, multimodal reference, edit/extend | Yes | 2.5565 |
 | doubao-seedance-2-0-260128 | 2.0 | Latest generation, highest quality, multimodal reference, up to 4k (default) | Yes | ~$0.146 |
 | doubao-seedance-2-0-fast-260128 | 2.0 Fast | Latest generation, faster, up to 720p | Yes | ~$0.117 |
 | doubao-seedance-2-0-mini-260615 | 2.0 Mini | Latest generation, lightweight, cheapest within 2.0, up to 720p | Yes | ~$0.073 |
@@ -28,7 +29,8 @@ async def seedance_list_models() -> str:
 | doubao-seedance-1-0-lite-i2v-250428 | Lite I2V | Lightweight image-to-video | No | ~$0.033 |
 
 Model Selection Guide:
-- Latest quality / default: doubao-seedance-2-0-260128 (up to 4k, multimodal reference)
+- Latest flagship: doubao-seedance-2-5-260628 (up to 30s, multimodal reference, edit/extend)
+- Default / highest resolution: doubao-seedance-2-0-260128 (up to 4k)
 - Latest fast: doubao-seedance-2-0-fast-260128
 - Latest lightweight / cheapest within 2.0: doubao-seedance-2-0-mini-260615
 - 1.5 flagship (audio): doubao-seedance-1-5-pro-251215
@@ -38,9 +40,9 @@ Model Selection Guide:
 - Image-to-video lightweight: doubao-seedance-1-0-lite-i2v-250428
 
 Notes:
-- Audio generation (generate_audio) is supported by the 1.5 Pro and 2.0 series models
-- Seedance 2.0 adds multimodal reference inputs: real-person/character image, reference audio, reference video
-- Resolution affects cost: 480p < 720p < 1080p < 4k ('4k' is doubao-seedance-2-0-260128 only; 2-0-fast / 2-0-mini max at 720p)
+- Audio generation (generate_audio) is supported by the 1.5 Pro and 2.x models
+- Seedance 2.0 adds multimodal reference inputs; Seedance 2.5 adds pure-audio reference, larger limits, edit, and extend
+- Resolution affects cost: 480p < 720p < 1080p < 4k ('4k' is doubao-seedance-2-0-260128 only; 2.5 / 2-0-fast / 2-0-mini max at 720p)
 """
 
 
@@ -53,7 +55,7 @@ async def seedance_list_resolutions() -> str:
     Returns:
         Tables of resolutions and aspect ratios with descriptions.
     """
-    # Last updated: 2026-04-05
+    # Last updated: 2026-08-14
     return """Available Seedance Resolutions:
 
 | Resolution | Description | Best For |
@@ -92,7 +94,7 @@ async def seedance_list_actions() -> str:
     Returns:
         Categorized list of all actions and their corresponding tools.
     """
-    # Last updated: 2026-04-05
+    # Last updated: 2026-08-14
     return """Available Seedance Actions and Tools:
 
 Video Generation:
@@ -135,7 +137,7 @@ Tips:
 - Use descriptive prompts for better results
 - Include motion descriptions: "walking", "flying", "zooming in"
 - Specify style: "cinematic", "realistic", "artistic", "anime"
-- 1.5 Pro model supports audio generation (~2x cost)
+- 1.5 Pro and 2.x models support audio generation
 - Use seed parameter for reproducible results
 - Use return_last_frame=true when planning to extend videos
 """

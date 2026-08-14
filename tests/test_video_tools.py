@@ -60,7 +60,11 @@ class TestSeedanceGenerateVideo:
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
         "model",
-        ["doubao-seedance-2-0-260128", "doubao-seedance-2-0-fast-260128"],
+        [
+            "doubao-seedance-2-5-260628",
+            "doubao-seedance-2-0-260128",
+            "doubao-seedance-2-0-fast-260128",
+        ],
     )
     async def test_new_models_parameter_sent_to_api(
         self, model: str, mock_video_response: dict
@@ -74,6 +78,22 @@ class TestSeedanceGenerateVideo:
             )
             call_kwargs = mock_client.generate_video.call_args[1]
             assert call_kwargs["model"] == model
+
+    @pytest.mark.asyncio
+    async def test_seedance_25_options_sent_to_api(self, mock_video_response: dict) -> None:
+        with patch("tools.video_tools.client") as mock_client:
+            mock_client.generate_video = AsyncMock(return_value=mock_video_response)
+            await seedance_generate_video(
+                prompt="A test video",
+                model="doubao-seedance-2-5-260628",
+                duration=30,
+                output_format="mov",
+                tools=[{"type": "web_search"}],
+            )
+            call_kwargs = mock_client.generate_video.call_args[1]
+            assert call_kwargs["duration"] == 30
+            assert call_kwargs["output_format"] == "mov"
+            assert call_kwargs["tools"] == [{"type": "web_search"}]
 
     @pytest.mark.asyncio
     async def test_execution_expires_after_default(self, mock_video_response: dict) -> None:
@@ -140,7 +160,11 @@ class TestSeedanceGenerateVideoFromImage:
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
         "model",
-        ["doubao-seedance-2-0-260128", "doubao-seedance-2-0-fast-260128"],
+        [
+            "doubao-seedance-2-5-260628",
+            "doubao-seedance-2-0-260128",
+            "doubao-seedance-2-0-fast-260128",
+        ],
     )
     async def test_new_models_parameter_sent_to_api(
         self, model: str, mock_video_response: dict
@@ -155,6 +179,28 @@ class TestSeedanceGenerateVideoFromImage:
             )
             call_kwargs = mock_client.generate_video.call_args[1]
             assert call_kwargs["model"] == model
+
+    @pytest.mark.asyncio
+    async def test_seedance_25_multimodal_roles_and_options(
+        self, mock_video_response: dict
+    ) -> None:
+        with patch("tools.video_tools.client") as mock_client:
+            mock_client.generate_video = AsyncMock(return_value=mock_video_response)
+            await seedance_generate_video_from_image(
+                prompt="Extend the shot",
+                reference_video_urls=["https://example.com/video.mp4"],
+                reference_audio_urls=["https://example.com/audio.mp3"],
+                model="doubao-seedance-2-5-260628",
+                ratio="adaptive",
+                duration=30,
+                omni_reference_task_type="extend",
+                output_format="mov",
+            )
+            call_kwargs = mock_client.generate_video.call_args[1]
+            assert call_kwargs["content"][1]["role"] == "reference_audio"
+            assert call_kwargs["content"][2]["role"] == "reference_video"
+            assert call_kwargs["omni_reference_task_type"] == "extend"
+            assert call_kwargs["output_format"] == "mov"
 
     @pytest.mark.asyncio
     async def test_execution_expires_after_default(self, mock_video_response: dict) -> None:

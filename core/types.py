@@ -4,6 +4,7 @@ from typing import Literal
 
 # Seedance video models
 SeedanceModel = Literal[
+    "doubao-seedance-2-5-260628",
     "doubao-seedance-2-0-260128",
     "doubao-seedance-2-0-fast-260128",
     "doubao-seedance-2-0-mini-260615",
@@ -47,6 +48,9 @@ ImageRole = Literal[
     "last_frame",
     "reference_image",
 ]
+
+OmniReferenceTaskType = Literal["auto", "edit", "extend"]
+OutputFormat = Literal["mp4", "mov"]
 
 # Default values
 DEFAULT_MODEL: SeedanceModel = "doubao-seedance-2-0-260128"

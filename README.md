@@ -364,7 +364,7 @@ Claude: I'll generate a video with synchronized audio.
 
 | Model                                 | Description       | Features                   |
 | ------------------------------------- | ----------------- | -------------------------- |
-| `doubao-seedance-2-0-260128`          | 2.0 (default)     | Latest generation, 4k, multimodal reference |
+| `doubao-seedance-2-5-260628`          | 2.5               | Up to 30s, edit/extend, multimodal reference |
 | `doubao-seedance-2-0-fast-260128`     | 2.0 Fast          | Latest generation fast     |
 | `doubao-seedance-2-0-mini-260615`     | 2.0 Mini          | Latest generation, lightweight, cheapest 2.0 |
 | `doubao-seedance-1-5-pro-251215`      | 1.5 Pro           | Audio generation, T2V, I2V |

@@ -36,7 +36,7 @@ When the user wants to generate video, choose the appropriate tool based on thei
 -> Call `seedance_generate_video_from_image` with first_frame_url=image_url and appropriate prompt
 
 ## Choosing the Right Model
-- **Latest generation quality:** `doubao-seedance-2-0-260128`
+- **Latest generation quality:** `doubao-seedance-2-5-260628`
 - **Latest generation fast:** `doubao-seedance-2-0-fast-260128`
 - **Latest generation lightweight / cheapest within 2.0:** `doubao-seedance-2-0-mini-260615`
 - **1.5 flagship + audio:** `doubao-seedance-1-5-pro-251215`
