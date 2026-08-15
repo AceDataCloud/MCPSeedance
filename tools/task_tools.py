@@ -48,8 +48,14 @@ async def seedance_get_task(
     # Throttle polling: sleep 5s for incomplete tasks so LLM clients
     # don't burn through poll attempts in seconds.
     response = result.get("response", {})
-    is_complete = response.get("success", False)
-    if not is_complete:
+    is_complete = response.get("success") is True
+    is_failed = response.get("success") is False or str(result.get("state", "")).lower() in {
+        "failed",
+        "error",
+        "cancelled",
+        "canceled",
+    }
+    if not is_complete and not is_failed:
         await asyncio.sleep(5)
     return format_task_result(result)
 

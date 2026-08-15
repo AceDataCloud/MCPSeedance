@@ -43,17 +43,19 @@ def _with_task_guidance(
 
     state = str(payload.get("state", "")).lower()
     response = payload.get("response", {})
-    response_success = response.get("success", False) if isinstance(response, dict) else False
-    top_level_success = (
-        payload.get("success", False) if isinstance(payload.get("success", False), bool) else False
-    )
+    response_success = response.get("success") if isinstance(response, dict) else None
+    top_level_success = payload.get("success")
 
     is_complete = (
         state in {"complete", "completed", "succeeded", "success"}
-        or response_success
-        or top_level_success
+        or response_success is True
+        or top_level_success is True
     )
-    is_failed = state in {"failed", "error", "cancelled", "canceled"}
+    is_failed = (
+        state in {"failed", "error", "cancelled", "canceled"}
+        or response_success is False
+        or top_level_success is False
+    )
     should_poll = not (is_complete or is_failed)
 
     payload["mcp_task_polling"] = {
