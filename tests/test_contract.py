@@ -2,6 +2,10 @@
 
 import inspect
 
+import pytest
+from pydantic import ValidationError
+
+from core.types import SeedanceWebSearchTool
 from tools import video_tools
 
 
@@ -17,3 +21,28 @@ def test_service_tier_is_not_exposed():
 def test_service_tier_is_not_sent():
     source = inspect.getsource(video_tools)
     assert '"service_tier"' not in source
+
+
+def test_web_search_tool_matches_api_contract():
+    tool = SeedanceWebSearchTool(
+        type="web_search",
+        limit=50,
+        max_keyword=1,
+        sources=["toutiao", "douyin", "moji", "search_engine"],
+    )
+
+    assert tool.model_dump(exclude_none=True) == {
+        "type": "web_search",
+        "limit": 50,
+        "max_keyword": 1,
+        "sources": ["toutiao", "douyin", "moji", "search_engine"],
+    }
+
+    with pytest.raises(ValidationError):
+        SeedanceWebSearchTool(type="web_search", limit=51)
+
+    with pytest.raises(ValidationError):
+        SeedanceWebSearchTool(type="unsupported")
+
+    with pytest.raises(ValidationError):
+        SeedanceWebSearchTool(type="web_search", unsupported=True)

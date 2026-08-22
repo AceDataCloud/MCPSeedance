@@ -16,6 +16,7 @@ from core.types import (
     OutputFormat,
     Resolution,
     SeedanceModel,
+    SeedanceWebSearchTool,
 )
 from core.utils import format_video_result
 
@@ -60,7 +61,7 @@ async def seedance_generate_video(
             description=(
                 "Video resolution. Options: '480p', '720p' (default), '1080p', '4k'. "
                 "'4k' is supported only by 'doubao-seedance-2-0-260128'; "
-                "'2-0-fast' and '2-0-mini' max out at '720p'."
+                "'2-5' maxes out at '1080p'; '2-0-fast' and '2-0-mini' max out at '720p'."
             )
         ),
     ] = DEFAULT_RESOLUTION,
@@ -143,8 +144,22 @@ async def seedance_generate_video(
         Field(description="Seedance 2.5 output format: mp4 or mov."),
     ] = None,
     tools: Annotated[
-        list[dict[str, Any]] | None,
-        Field(description="Optional Seedance 2.5 tool configuration objects."),
+        list[SeedanceWebSearchTool] | None,
+        Field(
+            description="Optional Seedance 2.5 web search tool configuration.",
+            max_length=1,
+        ),
+    ] = None,
+    priority: Annotated[
+        int,
+        Field(description="Seedance 2.5 task priority from 0 to 9.", ge=0, le=9),
+    ] = 0,
+    safety_identifier: Annotated[
+        str | None,
+        Field(
+            description="Stable anonymous end-user identifier. Do not use personal information.",
+            max_length=64,
+        ),
     ] = None,
     callback_url: Annotated[
         str | None,
@@ -191,6 +206,7 @@ async def seedance_generate_video(
         "watermark": watermark,
         "return_last_frame": return_last_frame,
         "execution_expires_after": execution_expires_after,
+        "priority": priority,
     }
 
     if frames is not None:
@@ -208,7 +224,15 @@ async def seedance_generate_video(
         payload["output_format"] = output_format
 
     if tools:
-        payload["tools"] = tools
+        payload["tools"] = [
+            tool.model_dump(exclude_none=True)
+            if isinstance(tool, SeedanceWebSearchTool)
+            else tool
+            for tool in tools
+        ]
+
+    if safety_identifier:
+        payload["safety_identifier"] = safety_identifier
 
     if callback_url:
         payload["callback_url"] = callback_url
@@ -297,7 +321,7 @@ async def seedance_generate_video_from_image(
             description=(
                 "Video resolution. Options: '480p', '720p', '1080p', '4k'. "
                 "'4k' is supported only by 'doubao-seedance-2-0-260128'; "
-                "'2-0-fast' and '2-0-mini' max out at '720p'."
+                "'2-5' maxes out at '1080p'; '2-0-fast' and '2-0-mini' max out at '720p'."
             )
         ),
     ] = DEFAULT_RESOLUTION,
@@ -361,8 +385,22 @@ async def seedance_generate_video_from_image(
         Field(description="Seedance 2.5 output format: mp4 or mov."),
     ] = None,
     tools: Annotated[
-        list[dict[str, Any]] | None,
-        Field(description="Optional Seedance 2.5 tool configuration objects."),
+        list[SeedanceWebSearchTool] | None,
+        Field(
+            description="Optional Seedance 2.5 web search tool configuration.",
+            max_length=1,
+        ),
+    ] = None,
+    priority: Annotated[
+        int,
+        Field(description="Seedance 2.5 task priority from 0 to 9.", ge=0, le=9),
+    ] = 0,
+    safety_identifier: Annotated[
+        str | None,
+        Field(
+            description="Stable anonymous end-user identifier. Do not use personal information.",
+            max_length=64,
+        ),
     ] = None,
     callback_url: Annotated[
         str | None,
@@ -460,6 +498,7 @@ async def seedance_generate_video_from_image(
         "ratio": ratio,
         "return_last_frame": return_last_frame,
         "execution_expires_after": execution_expires_after,
+        "priority": priority,
     }
 
     if frames is not None:
@@ -480,7 +519,15 @@ async def seedance_generate_video_from_image(
         payload["output_format"] = output_format
 
     if tools:
-        payload["tools"] = tools
+        payload["tools"] = [
+            tool.model_dump(exclude_none=True)
+            if isinstance(tool, SeedanceWebSearchTool)
+            else tool
+            for tool in tools
+        ]
+
+    if safety_identifier:
+        payload["safety_identifier"] = safety_identifier
 
     if callback_url:
         payload["callback_url"] = callback_url

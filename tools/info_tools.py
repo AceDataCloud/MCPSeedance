@@ -42,7 +42,7 @@ Model Selection Guide:
 Notes:
 - Audio generation (generate_audio) is supported by the 1.5 Pro and 2.x models
 - Seedance 2.0 adds multimodal reference inputs; Seedance 2.5 adds pure-audio reference, larger limits, edit, and extend
-- Resolution affects cost: 480p < 720p < 1080p < 4k ('4k' is doubao-seedance-2-0-260128 only; 2.5 / 2-0-fast / 2-0-mini max at 720p)
+- Resolution affects cost: 480p < 720p < 1080p < 4k ('4k' is doubao-seedance-2-0-260128 only; 2.5 maxes at 1080p; 2-0-fast / 2-0-mini max at 720p)
 """
 
 

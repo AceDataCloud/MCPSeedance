@@ -88,12 +88,30 @@ class TestSeedanceGenerateVideo:
                 model="doubao-seedance-2-5-260628",
                 duration=30,
                 output_format="mov",
-                tools=[{"type": "web_search"}],
+                tools=[
+                    {
+                        "type": "web_search",
+                        "limit": 5,
+                        "max_keyword": 3,
+                        "sources": ["search_engine"],
+                    }
+                ],
+                priority=9,
+                safety_identifier="anonymous-user-123",
             )
             call_kwargs = mock_client.generate_video.call_args[1]
             assert call_kwargs["duration"] == 30
             assert call_kwargs["output_format"] == "mov"
-            assert call_kwargs["tools"] == [{"type": "web_search"}]
+            assert call_kwargs["tools"] == [
+                {
+                    "type": "web_search",
+                    "limit": 5,
+                    "max_keyword": 3,
+                    "sources": ["search_engine"],
+                }
+            ]
+            assert call_kwargs["priority"] == 9
+            assert call_kwargs["safety_identifier"] == "anonymous-user-123"
 
     @pytest.mark.asyncio
     async def test_execution_expires_after_default(self, mock_video_response: dict) -> None:
@@ -195,12 +213,18 @@ class TestSeedanceGenerateVideoFromImage:
                 duration=30,
                 omni_reference_task_type="extend",
                 output_format="mov",
+                tools=[{"type": "web_search"}],
+                priority=8,
+                safety_identifier="anonymous-user-456",
             )
             call_kwargs = mock_client.generate_video.call_args[1]
             assert call_kwargs["content"][1]["role"] == "reference_audio"
             assert call_kwargs["content"][2]["role"] == "reference_video"
             assert call_kwargs["omni_reference_task_type"] == "extend"
             assert call_kwargs["output_format"] == "mov"
+            assert call_kwargs["tools"] == [{"type": "web_search"}]
+            assert call_kwargs["priority"] == 8
+            assert call_kwargs["safety_identifier"] == "anonymous-user-456"
 
     @pytest.mark.asyncio
     async def test_execution_expires_after_default(self, mock_video_response: dict) -> None:

@@ -1,6 +1,8 @@
 """Type definitions for Seedance MCP server."""
 
-from typing import Literal
+from typing import Annotated, Literal
+
+from pydantic import BaseModel, ConfigDict, Field
 
 # Seedance video models
 SeedanceModel = Literal[
@@ -51,6 +53,18 @@ ImageRole = Literal[
 
 OmniReferenceTaskType = Literal["auto", "edit", "extend"]
 OutputFormat = Literal["mp4", "mov"]
+WebSearchSource = Literal["toutiao", "douyin", "moji", "search_engine"]
+
+
+class SeedanceWebSearchTool(BaseModel):
+    """Seedance web search tool configuration."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    type: Literal["web_search"]
+    limit: Annotated[int, Field(ge=1, le=50)] = 10
+    max_keyword: Annotated[int | None, Field(ge=1, le=50)] = None
+    sources: list[WebSearchSource] | None = None
 
 # Default values
 DEFAULT_MODEL: SeedanceModel = "doubao-seedance-2-0-260128"
