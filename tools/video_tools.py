@@ -225,15 +225,12 @@ async def seedance_generate_video(
 
     if tools:
         payload["tools"] = [
-            tool.model_dump(exclude_none=True)
-            if isinstance(tool, SeedanceWebSearchTool)
-            else tool
+            tool.model_dump(exclude_none=True) if isinstance(tool, SeedanceWebSearchTool) else tool
             for tool in tools
         ]
 
     if safety_identifier:
         payload["safety_identifier"] = safety_identifier
-
     if callback_url:
         payload["callback_url"] = callback_url
 
@@ -520,15 +517,12 @@ async def seedance_generate_video_from_image(
 
     if tools:
         payload["tools"] = [
-            tool.model_dump(exclude_none=True)
-            if isinstance(tool, SeedanceWebSearchTool)
-            else tool
+            tool.model_dump(exclude_none=True) if isinstance(tool, SeedanceWebSearchTool) else tool
             for tool in tools
         ]
 
     if safety_identifier:
         payload["safety_identifier"] = safety_identifier
-
     if callback_url:
         payload["callback_url"] = callback_url
 

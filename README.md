@@ -17,7 +17,7 @@ Generate AI videos directly from Claude, VS Code, or any MCP-compatible client.
 - **Text to Video** - Create AI-generated videos from text prompts
 - **Image to Video** - Animate images with first frame, last frame, and reference image control
 - **Multiple Models** - Support for Seedance 2.0 (incl. Fast/Mini, multimodal reference), 1.5 Pro, 1.0 Pro, 1.0 Pro Fast, 1.0 Lite T2V/I2V
-- **Multiple Resolutions** - 480p, 720p (default), 1080p, and 4k output (4k: `doubao-seedance-2-0-260128` only)
+- **Multiple Resolutions** - 480p, 720p (default), 1080p, and 4k output (2.5 supports 1080p; 4k: `doubao-seedance-2-0-260128` only)
 - **Flexible Aspect Ratios** - 16:9, 9:16, 1:1, 4:3, 3:4, 21:9, and adaptive
 - **Audio Generation** - Generate synchronized audio for videos (1.5 Pro and 2.0 series)
 - **Service Tiers** - Default (priority) and Flex (cost-effective) processing
@@ -364,7 +364,7 @@ Claude: I'll generate a video with synchronized audio.
 
 | Model                                 | Description       | Features                   |
 | ------------------------------------- | ----------------- | -------------------------- |
-| `doubao-seedance-2-5-260628`          | 2.5               | Up to 30s, edit/extend, multimodal reference |
+| `doubao-seedance-2-5-260628`          | 2.5               | Up to 30s and 1080p, edit/extend, multimodal reference |
 | `doubao-seedance-2-0-fast-260128`     | 2.0 Fast          | Latest generation fast     |
 | `doubao-seedance-2-0-mini-260615`     | 2.0 Mini          | Latest generation, lightweight, cheapest 2.0 |
 | `doubao-seedance-1-5-pro-251215`      | 1.5 Pro           | Audio generation, T2V, I2V |

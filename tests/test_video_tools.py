@@ -250,3 +250,17 @@ class TestSeedanceGenerateVideoFromImage:
             )
             call_kwargs = mock_client.generate_video.call_args[1]
             assert call_kwargs["execution_expires_after"] == 7200
+
+
+def test_seedance_tools_expose_metered_controls():
+    from inspect import signature
+
+    from tools.video_tools import seedance_generate_video
+
+    params = signature(
+        seedance_generate_video.fn
+        if hasattr(seedance_generate_video, "fn")
+        else seedance_generate_video
+    ).parameters
+    assert "priority" in params
+    assert "safety_identifier" in params

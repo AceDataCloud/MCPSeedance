@@ -66,6 +66,7 @@ class SeedanceWebSearchTool(BaseModel):
     max_keyword: Annotated[int | None, Field(ge=1, le=50)] = None
     sources: list[WebSearchSource] | None = None
 
+
 # Default values
 DEFAULT_MODEL: SeedanceModel = "doubao-seedance-2-0-260128"
 DEFAULT_RESOLUTION: Resolution = "720p"
