@@ -68,7 +68,7 @@ mcp-seedance = "main:main"
 
 [project.urls]
 Homepage = "https://github.com/AceDataCloud/SeedanceMCP"
-Documentation = "https://platform.acedata.cloud/documents/0083b874-4da6-40df-87e3-835b1300c1e8"
+Documentation = "https://platform.acedata.cloud/documents/seedance-mcp"
 Repository = "https://github.com/AceDataCloud/SeedanceMCP"
 Issues = "https://github.com/AceDataCloud/SeedanceMCP/issues"
 Changelog = "https://github.com/AceDataCloud/SeedanceMCP/blob/main/CHANGELOG.md"

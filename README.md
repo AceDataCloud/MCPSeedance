@@ -40,7 +40,7 @@ Generate AI videos directly from Claude, VS Code, or any MCP-compatible client.
 ### 1. Get Your API Token
 
 1. Sign up at [AceDataCloud Platform](https://platform.acedata.cloud)
-2. Go to the [API documentation page](https://platform.acedata.cloud/documents/0083b874-4da6-40df-87e3-835b1300c1e8)
+2. Go to the [API documentation page](https://platform.acedata.cloud/documents/seedance-videos)
 3. Click **"Acquire"** to get your API token
 4. Copy the token for use below
 
@@ -512,10 +512,10 @@ SeedanceMCP/
 
 ## API Reference
 
-This server wraps the [AceDataCloud Seedance API](https://platform.acedata.cloud/documents/0083b874-4da6-40df-87e3-835b1300c1e8):
+This server wraps the [AceDataCloud Seedance API](https://platform.acedata.cloud/documents/seedance-videos):
 
-- [Seedance Videos API](https://platform.acedata.cloud/documents/0083b874-4da6-40df-87e3-835b1300c1e8) - Video generation
-- [Seedance Tasks API](https://platform.acedata.cloud/documents/c09d6a1b-3cca-4f7c-add3-8c14be60da3c) - Task queries
+- [Seedance Videos API](https://platform.acedata.cloud/documents/seedance-videos) - Video generation
+- [Seedance Tasks API](https://platform.acedata.cloud/documents/seedance-tasks) - Task queries
 
 ## Contributing
 
@@ -526,6 +526,11 @@ Contributions are welcome! Please:
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing`)
 5. Open a Pull Request
+
+## Documentation
+
+<!-- canonical-documentation -->
+[Documentation](https://platform.acedata.cloud/documents/seedance-mcp)
 
 ## License
 

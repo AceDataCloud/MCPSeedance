@@ -56,7 +56,7 @@ For screenshots, token setup, project-level and user-level `mcp.json`, and Copil
 
 ## Pricing
 
-From $0.15 per clip. Free trial credit on sign-up. See full pricing at [https://docs.acedata.cloud](https://docs.acedata.cloud).
+From $0.15 per clip. Free trial credit on sign-up. See full pricing at [https://platform.acedata.cloud/documents/seedance-mcp](https://platform.acedata.cloud/documents/seedance-mcp).
 
 ---
 
@@ -128,7 +128,7 @@ version, install [`uv`](https://docs.astral.sh/uv/) and use:
 - **PyPI package:** [`mcp-seedance`](https://pypi.org/project/mcp-seedance/)
 - **Source repository:** https://github.com/AceDataCloud/SeedanceMCP
 - **Ace Data Cloud platform:** https://platform.acedata.cloud
-- **MCP documentation:** https://docs.acedata.cloud
+- **MCP documentation:** https://platform.acedata.cloud/documents/seedance-mcp
 
 ## License
 
