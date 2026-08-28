@@ -18,6 +18,7 @@ load_dotenv()
 
 from core.config import settings
 from core.server import mcp
+from core.server_card import registered_tool_cards
 
 # Configure logging
 logging.basicConfig(
@@ -165,33 +166,7 @@ Environment Variables:
                     {
                         "serverInfo": {"name": "Seedance MCP"},
                         "authentication": {"required": True, "schemes": ["bearer"]},
-                        "tools": [
-                            {
-                                "name": "seedance_generate_video",
-                                "description": "Generate video from text",
-                            },
-                            {
-                                "name": "seedance_generate_video_from_image",
-                                "description": "Generate video from image",
-                            },
-                            {"name": "seedance_get_task", "description": "Query task status"},
-                            {
-                                "name": "seedance_get_tasks_batch",
-                                "description": "Query multiple tasks",
-                            },
-                            {
-                                "name": "seedance_list_models",
-                                "description": "List available models",
-                            },
-                            {
-                                "name": "seedance_list_resolutions",
-                                "description": "List supported resolutions",
-                            },
-                            {
-                                "name": "seedance_list_actions",
-                                "description": "List available actions",
-                            },
-                        ],
+                        "tools": registered_tool_cards(mcp),
                         "prompts": [
                             {
                                 "name": "seedance_video_generation_guide",
