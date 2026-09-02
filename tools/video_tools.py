@@ -377,7 +377,7 @@ async def seedance_generate_video_from_image(
     ] = False,
     omni_reference_task_type: Annotated[
         OmniReferenceTaskType | None,
-        Field(description="Seedance 2.5 task type: auto, edit, or extend."),
+        Field(description="Seedance 2.5 task type: auto, reference, edit, or extend."),
     ] = None,
     output_format: Annotated[
         OutputFormat | None,

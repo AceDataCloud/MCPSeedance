@@ -51,7 +51,7 @@ ImageRole = Literal[
     "reference_image",
 ]
 
-OmniReferenceTaskType = Literal["auto", "edit", "extend"]
+OmniReferenceTaskType = Literal["auto", "reference", "edit", "extend"]
 OutputFormat = Literal["mp4", "mov"]
 WebSearchSource = Literal["toutiao", "douyin", "moji", "search_engine"]
 

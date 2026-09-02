@@ -211,7 +211,7 @@ class TestSeedanceGenerateVideoFromImage:
                 model="doubao-seedance-2-5-260628",
                 ratio="adaptive",
                 duration=30,
-                omni_reference_task_type="extend",
+                omni_reference_task_type="reference",
                 output_format="mov",
                 tools=[{"type": "web_search"}],
                 priority=8,
@@ -220,7 +220,7 @@ class TestSeedanceGenerateVideoFromImage:
             call_kwargs = mock_client.generate_video.call_args[1]
             assert call_kwargs["content"][1]["role"] == "reference_audio"
             assert call_kwargs["content"][2]["role"] == "reference_video"
-            assert call_kwargs["omni_reference_task_type"] == "extend"
+            assert call_kwargs["omni_reference_task_type"] == "reference"
             assert call_kwargs["output_format"] == "mov"
             assert call_kwargs["tools"] == [{"type": "web_search"}]
             assert call_kwargs["priority"] == 8
