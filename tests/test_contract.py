@@ -1,11 +1,12 @@
 """Guards against re-introducing params the API no longer accepts."""
 
 import inspect
+from typing import get_args
 
 import pytest
 from pydantic import ValidationError
 
-from core.types import SeedanceWebSearchTool
+from core.types import OmniReferenceTaskType, SeedanceWebSearchTool
 from tools import video_tools
 
 
@@ -46,3 +47,7 @@ def test_web_search_tool_matches_api_contract():
 
     with pytest.raises(ValidationError):
         SeedanceWebSearchTool(type="web_search", unsupported=True)
+
+
+def test_omni_reference_task_type_matches_api_contract():
+    assert set(get_args(OmniReferenceTaskType)) == {"auto", "reference", "edit", "extend"}
